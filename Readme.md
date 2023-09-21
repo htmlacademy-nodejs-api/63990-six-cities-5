@@ -1,7 +1,7 @@
 # Личный проект «Шесть городов»
 
 * Студент: [Дияс Нурдыканов](https://up.htmlacademy.ru/nodejs-api/5/user/63990).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Наумов](https://htmlacademy.ru/profile/naumov_evg).
 
 ---
 
