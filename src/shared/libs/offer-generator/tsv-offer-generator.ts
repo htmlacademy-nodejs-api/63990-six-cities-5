@@ -6,6 +6,9 @@ import { MockServerData } from '../../types/mock-server-data.type.js';
 const MIN_RATING = 1;
 const MAX_RATING = 5;
 
+const MIN_ROOMS = 1;
+const MAX_ROOMS = 8;
+
 const MIN_GUESTS = 1;
 const MAX_GUESTS = 10;
 
@@ -28,7 +31,7 @@ export class TSVOfferGenerator implements OfferGenerator {
     const isFavorite = Boolean(generateRandomValue(0, 1)).toString();
     const rating = generateRandomValue(MIN_RATING, MAX_RATING).toString();
     const houseType = getRandomItem(this.mockData.houseTypes);
-    const roomsCount = generateRandomValue(MIN_GUESTS, MAX_GUESTS).toString();
+    const roomsCount = generateRandomValue(MIN_ROOMS, MAX_ROOMS).toString();
     const guestsCount = generateRandomValue(MIN_GUESTS, MAX_GUESTS).toString();
     const cost = generateRandomValue(MIN_COST, MAX_COST).toString();
     const facilities = getRandomItems(this.mockData.facilities).join(';');
