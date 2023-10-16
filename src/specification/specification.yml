@@ -1,0 +1,273 @@
+openapi: 3.0.0
+info:
+  title: API сервер для проекта «Шесть городов».
+  description: |-
+    * Список ресурсов и маршрутов сервера «Шесть городов».
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: offers
+    description: Действия с предложениями по аренде.
+  - name: users
+    description: Действия с пользователем.
+
+paths:
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUser'
+        required: true
+
+      responses:
+        "201":
+          description: Пользователь зарегистрирован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+        "409":
+          description: Пользователь с таким email уже существует.
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Авторизация пользователя
+      description: Авторизует пользователя на основе логина и пароля
+
+      requestBody:
+        description: Информация для создания авторизации.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+        required: true
+
+      responses:
+        "200":
+          description: Пользователь авторизован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+        "401":
+          description: Неправильный логин или пароль.
+
+
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю
+
+      responses:
+        "200":
+          description: Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+  /offers:
+    post:
+      tags:
+        - offers
+      summary: Создание нового предложения.
+      description: Создает новое предложение.
+
+      requestBody:
+        description: Информация для создания нового предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offer'
+        required: true
+
+      responses:
+        "201":
+          description: Gредложение создано. Объект предложения.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+    patch:
+      tags:
+        - offers
+      summary: Редактирование предложения.
+      description: Редактирует предложения.
+
+      requestBody:
+        description: Информация для редактирования предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editOffer'
+        required: true
+
+      responses:
+        "200":
+          description: Предложение обновлено. Объект предложения.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+    delete:
+      tags:
+        - offers
+      summary: Удаление предложения.
+      description: Удаляет предложения.
+
+      parameters:
+        - in: path
+          name: offerId
+          schema:
+            type: integer
+          required: true
+          description: ИД предложения
+
+      responses:
+        "200":
+          description: Предложение обновлено. Объект предложения.
+
+components:
+  schemas:
+    createUser:
+      type: object
+
+      properties:
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        name:
+          type: string
+          example: Keks
+
+        type:
+          type: string
+          example: pro
+
+        password:
+          type: string
+          example: 123456
+
+    user:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+    login:
+      type: object
+
+      properties:
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        password:
+          type: string
+          example: 123456
+
+    offer:
+      type: object
+
+      properties:
+        name:
+          type: string
+          example: Wood and stone place
+
+        desc:
+          type: string
+          example: A quiet cozy and picturesque that hides
+
+        createDate:
+          type: string
+          example: 2022-04-11T08:45:40.284Z
+
+        city:
+          type: string
+          example: Paris
+
+        preview:
+          type: string
+          example: studio-01.jpg
+
+        photos:
+          type: array
+          example: [studio-01.jpg, studio-02.jpg]
+
+        isPremium:
+          type: boolean
+          example: true
+
+        isFavorite:
+          type: boolean
+          example: false
+
+        rating:
+          type: number
+          example: 4
+
+        houseType:
+          type: string
+          example: apartment
+
+        roomsCount:
+          type: number
+          example: 2
+
+        guestsCount:
+          type: number
+          example: 3
+
+        cost:
+          type: number
+          example: 50000
+
+        facilities:
+          type: array
+          example: [Breakfast, Air conditioning]
+
+        author:
+          type: string
+          example: 1
+
+        commentsCount:
+          type: number
+          example: 1
+
+        coords:
+          type: array
+          example: [48.85661, 2.351499]
+
+    editOffer:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 1
+
+        name:
+          type: string
+          example: Wood and stone place 2
