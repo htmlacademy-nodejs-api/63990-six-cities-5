@@ -8,7 +8,6 @@ export class UpdateOfferDto {
   public preview?: string;
   public photos?: string[];
   public isPremium?: boolean;
-  public isFavorite?: boolean;
   public rating?: number;
   public houseType?: HouseType;
   public roomsCount?: number;
