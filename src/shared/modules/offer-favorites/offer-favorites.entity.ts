@@ -7,7 +7,7 @@ export interface OfferFavoritesEntity extends defaultClasses.Base {}
 
 @modelOptions({
   schemaOptions: {
-    collection: 'offers-favofites'
+    collection: 'offers-favorites'
   }
 })
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging

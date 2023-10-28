@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 
 export class OfferRdo {
-  @Expose()
+  @Expose({ name: '_id'})
   public id: string;
 
   @Expose()
@@ -14,10 +14,10 @@ export class OfferRdo {
   public type: string;
 
   @Expose()
-  public isFavorite: string;
+  public isFavorite: boolean;
 
   @Expose()
-  public isPremium: string;
+  public isPremium: boolean;
 
   @Expose()
   public createDate: Date;

@@ -1,9 +1,10 @@
 import { injectable, inject } from 'inversify';
-import { BaseController, HttpMethod } from '../../libs/rest/index.js';
+import { BaseController, HttpMethod, ValidateDtoMiddleware } from '../../libs/rest/index.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../libs/logger/index.js';
 import { Request, Response } from 'express';
 import { OfferFavoritesService } from './offer-favorites-service.interface.js';
+import { AddFavoriteOfferDto } from './dto/add-favorite-offer.dto.js';
 
 
 @injectable()
@@ -16,7 +17,13 @@ export class OfferFavoritesController extends BaseController {
 
     this.logger.info('Register routes for OfferFavoritesController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.add });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.add,
+      middlewares: [new ValidateDtoMiddleware(AddFavoriteOfferDto)]
+    });
+
     this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.delete });
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
   }
