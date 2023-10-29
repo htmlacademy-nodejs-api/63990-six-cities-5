@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { fillDTO } from '../../helpers/index.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
 import { CreateCommentDto } from './index.js';
+import { PrivateRouteMiddleware } from '../../libs/rest/middleware/private-route.middleware.js';
 
 @injectable()
 export class CommentController extends BaseController {
@@ -25,12 +26,13 @@ export class CommentController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateDtoMiddleware(CreateCommentDto)
       ]
     });
   }
 
-  public async create({ body }: CreateCommentRequest, res: Response) {
+  public async create({ body, tokenPayload }: CreateCommentRequest, res: Response) {
     const offer = await this.offerService.exists(body.offerId);
 
     if (!offer) {
@@ -41,7 +43,7 @@ export class CommentController extends BaseController {
       );
     }
 
-    const comment = await this.commentService.create(body);
+    const comment = await this.commentService.create({ ...body, userId: tokenPayload.id });
     await this.offerService.incCommentCount(body.offerId);
 
     this.created(res, fillDTO(CommentRdo, comment));

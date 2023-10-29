@@ -14,6 +14,7 @@ import { CommentService } from '../comment/comment-service.interface.js';
 import { CommentRdo } from '../comment/index.js';
 import { PREMIUM_OFFER_COUNT } from './offer.constant.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
+import { PrivateRouteMiddleware } from '../../libs/rest/middleware/private-route.middleware.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -31,7 +32,10 @@ export class OfferController extends BaseController {
       path: '/',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateOfferDto)
+      ]
     });
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremium });
 
@@ -50,6 +54,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
       ]
@@ -60,6 +65,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
       ]
@@ -87,7 +93,7 @@ export class OfferController extends BaseController {
   }
 
   public async create(
-    { body }: CreateOfferRequest,
+    { body, tokenPayload }: CreateOfferRequest,
     res: Response
   ): Promise<void> {
 
@@ -102,7 +108,7 @@ export class OfferController extends BaseController {
 
     }
 
-    const result = await this.offerService.create(body);
+    const result = await this.offerService.create({ ...body, author: tokenPayload.id });
     this.created(res, fillDTO(OfferRdo, result));
   }
 
