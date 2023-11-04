@@ -19,7 +19,7 @@ export class OfferFavoritesEntity extends defaultClasses.TimeStamps {
   public userId: Ref<UserEntity>;
 
   @prop({
-    ref: OfferEntity,
+    ref: 'OfferEntity',
     required: true
   })
   public offerId: Ref<OfferEntity>;

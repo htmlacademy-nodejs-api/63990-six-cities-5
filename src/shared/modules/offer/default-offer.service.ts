@@ -9,6 +9,7 @@ import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { DEFAULT_OFFER_COUNT } from './offer.constant.js';
 import { SortType } from '../../types/sort-type.enum.js';
 
+
 @injectable()
 export class DefaultOfferService implements OfferService {
   constructor(
@@ -23,10 +24,16 @@ export class DefaultOfferService implements OfferService {
     return result;
   }
 
-  public async findById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async findById(offerId: string, userId?: string): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findById(offerId)
-      .populate(['author'])
+      .populate({
+        path: 'isFavorite',
+        model: 'OfferFavoritesModel',
+        match: {
+          userId: { $eq: userId }
+        }
+      })
       .exec();
   }
 
@@ -36,51 +43,21 @@ export class DefaultOfferService implements OfferService {
       .exec();
   }
 
-  public async find(limit = DEFAULT_OFFER_COUNT): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .aggregate([
-        {
-          $lookup: {
-            from: 'comments',
-            let: { offerId: '$_id'},
-            pipeline: [
-              { $match: { $expr: { $eq: [ '$offerId', '$$offerId' ] } } },
-              { $project: { _id: 1, rating: 1}}
-            ],
-            as: 'offerComments'
-          },
-        },
-        {
-          $lookup: {
-            from: 'offers-favorites',
-            let: { offerId: '$_id', userId: '$author' },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: [ '$offerId', '$$offerId' ] },
-                      { $eq: [ '$userId', '$$userId' ] }
-                    ]
-                  }
-                }
-              },
-              { $project: { _id: 1 }}
-            ],
-            as: 'favorites'
-          },
-        },
-        { $addFields:
-          {
-            rating: { $round: [ { $avg: '$offerComments.rating'}, 1 ] },
-            isFavorite: { $toBool: { $size: '$favorites' } }
-          }
-        },
-        { $unset: ['offerComments', 'favorites'] },
-        { $limit: limit },
-        { $sort: { offerCount: SortType.Down } }
-      ])
-      .exec();
+  public async find(limit = DEFAULT_OFFER_COUNT, userId = ''): Promise<DocumentType<OfferEntity>[]> {
+    const result = this.offerModel
+      .find()
+      .limit(limit)
+      .sort({createDate: SortType.Down});
+
+    const populateOptions = {
+      path: 'isFavorite',
+      model: 'OfferFavoritesModel',
+      match: {
+        userId: { $eq: userId }
+      },
+    };
+
+    return userId ? result.populate(populateOptions) : result;
   }
 
   public async deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
@@ -100,10 +77,11 @@ export class DefaultOfferService implements OfferService {
       .exists({_id: documentId})) !== null;
   }
 
-  public async incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async incCommentCount(offerId: string, rating: number): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(offerId, {'$inc': {
         commentsCount: 1,
+        commentsRatingSum: rating
       }}).exec();
   }
 

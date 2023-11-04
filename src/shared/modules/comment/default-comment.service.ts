@@ -4,6 +4,8 @@ import { Component } from '../../types/index.js';
 import { DocumentType, types } from '@typegoose/typegoose';
 import { CommentEntity } from './comment.entity.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
+import { DEFAULT_COMMENT_COUNT } from './comment.constant.js';
+import { SortType } from '../../types/sort-type.enum.js';
 
 @injectable()
 export class DefaultCommentService implements CommentService {
@@ -19,6 +21,8 @@ export class DefaultCommentService implements CommentService {
   public async findByOfferId(offerId: string): Promise<DocumentType<CommentEntity>[]> {
     return this.commentModel
       .find({offerId})
+      .limit(DEFAULT_COMMENT_COUNT)
+      .sort({postDate: SortType.Down})
       .populate('userId');
   }
 

@@ -14,3 +14,4 @@ export * from './middleware/validate-dto.middleware.js';
 export * from './middleware/document-exists.middleware.js';
 export * from './middleware/document-exists.interface.js';
 export * from './middleware/upload-file.middleware.js';
+export * from './middleware/validate-author.middleware.js';

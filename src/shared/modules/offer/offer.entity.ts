@@ -4,6 +4,7 @@ import { City } from '../../types/city.enum.js';
 import { HouseType } from '../../types/house-type.enum.js';
 import { FacilitiesType } from '../../types/facilities-type.enum.js';
 import { Coords } from '../../types/coords.type.js';
+import { OfferFavoritesEntity } from '../offer-favorites/offer-favorites.entity.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface OfferEntity extends defaultClasses.Base {}
@@ -72,8 +73,28 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({default: 0})
   public commentsCount?: number;
 
+  @prop({default: 0})
+  public commentsRatingSum?: number;
+
   @prop({ required: true })
   public coords: Coords;
+
+  @prop({
+    default: false,
+    ref: () => OfferFavoritesEntity,
+    foreignField: 'offerId',
+    localField: '_id',
+    justOne: true
+  })
+  public isFavorite: boolean;
+
+  @prop({
+    get: function() {
+      return +(this.commentsRatingSum / this.commentsCount).toFixed(2);
+    },
+    default: 0
+  })
+  public rating: boolean;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

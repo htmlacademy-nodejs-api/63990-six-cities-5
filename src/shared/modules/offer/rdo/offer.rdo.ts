@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 export class OfferRdo {
   @Expose({ name: '_id'})
@@ -14,6 +14,7 @@ export class OfferRdo {
   public type: string;
 
   @Expose()
+  @Type(() => Boolean)
   public isFavorite: boolean;
 
   @Expose()

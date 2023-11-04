@@ -45,6 +45,7 @@ export const CreateOfferValidationMessage = {
     maxValue: 'Maximum guestsCount is 10',
   },
   facilities: {
+    invalidFormat: 'Field facilities must be an array',
     invalid: 'type must be Facilities',
   },
   coords: {

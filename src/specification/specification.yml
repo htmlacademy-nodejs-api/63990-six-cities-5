@@ -12,6 +12,8 @@ tags:
     description: Действия с предложениями по аренде.
   - name: users
     description: Действия с пользователем.
+servers:
+  - url: http://localhost:5000/
 
 paths:
   /users/register:

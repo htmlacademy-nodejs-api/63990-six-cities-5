@@ -21,4 +21,7 @@ export const Component = {
   OfferFavoritesService: Symbol.for('OfferFavoritesService'),
   OfferFavoritesModel: Symbol.for('OfferFavoritesModel'),
   OfferFavoritesController: Symbol.for('OfferFavoritesController'),
+
+  AuthService: Symbol.for('AuthService'),
+  AuthExceptionFilter: Symbol.for('AuthExceptionFilter'),
 } as const;

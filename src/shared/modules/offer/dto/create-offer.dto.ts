@@ -1,5 +1,6 @@
-import { IsArray, IsDateString, IsEnum, IsInt, IsMongoId, Max, MaxLength, Min, MinLength, IsString, IsBoolean, IsLatLong } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsInt, Max, MaxLength, Min, MinLength, IsString, IsBoolean, isLatitude, isLongitude } from 'class-validator';
 import { CreateOfferValidationMessage } from './create-offer.messages.js';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 
 import { City, HouseType, FacilitiesType, Coords } from '../../../types/index.js';
 
@@ -22,7 +23,7 @@ export class CreateOfferDto {
   public preview: string;
 
   @IsArray({ message: CreateOfferValidationMessage.photos.invalidFormat })
-  @IsString({ message: CreateOfferValidationMessage.photos.invalid })
+  @IsString({ each: true, message: CreateOfferValidationMessage.photos.invalid })
   public photos: string[];
 
   @IsBoolean({ message: CreateOfferValidationMessage.isPremium.invalid })
@@ -46,12 +47,29 @@ export class CreateOfferDto {
   @Max(100000, { message: CreateOfferValidationMessage.cost.maxValue })
   public cost: number;
 
-  @IsEnum(FacilitiesType, { message: CreateOfferValidationMessage.facilities.invalid })
+  @IsArray({ message: CreateOfferValidationMessage.facilities.invalidFormat })
+  @IsEnum(FacilitiesType, { each: true, message: CreateOfferValidationMessage.facilities.invalid })
   public facilities: FacilitiesType[];
 
-  @IsMongoId({ message: CreateOfferValidationMessage.author.invalidId })
   public author: string;
 
-  @IsLatLong({ message: CreateOfferValidationMessage.coords.invalid })
+  @IsCoords({ message: CreateOfferValidationMessage.coords.invalid })
   public coords: Coords;
+}
+
+export function IsCoords(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'IsCoords',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: Array<number>) {
+          const [latitude, longitude] = value;
+          return isLatitude(latitude.toString()) && isLongitude(longitude.toString());
+        },
+      },
+    });
+  };
 }
