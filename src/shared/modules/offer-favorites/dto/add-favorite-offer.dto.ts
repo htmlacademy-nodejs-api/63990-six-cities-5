@@ -5,6 +5,5 @@ export class AddFavoriteOfferDto {
   @IsMongoId({ message: AddFavoriteMessages.offerId.invalidFormat })
   public offerId: string;
 
-  @IsMongoId({ message: AddFavoriteMessages.userId.invalidFormat })
   public userId: string;
 }

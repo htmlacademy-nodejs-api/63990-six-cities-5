@@ -12,8 +12,8 @@ export class DefaultOfferFavoritesService implements OfferFavoritesService {
     @inject(Component.OfferFavoritesModel) private readonly offerFavoritesModel: types.ModelType<OfferFavoritesEntity>
   ) {}
 
-  public async find(): Promise<DocumentType<OfferFavoritesEntity>[]> {
-    const results = await this.offerFavoritesModel.find().populate('offerId');
+  public async find(userId: string): Promise<DocumentType<OfferFavoritesEntity>[]> {
+    const results = await this.offerFavoritesModel.find({ userId }).populate('offerId');
     return results;
   }
 

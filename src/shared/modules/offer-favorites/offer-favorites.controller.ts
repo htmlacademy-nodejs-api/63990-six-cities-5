@@ -5,6 +5,9 @@ import { Logger } from '../../libs/logger/index.js';
 import { Request, Response } from 'express';
 import { OfferFavoritesService } from './offer-favorites-service.interface.js';
 import { AddFavoriteOfferDto } from './dto/add-favorite-offer.dto.js';
+import { PrivateRouteMiddleware } from '../../libs/rest/middleware/private-route.middleware.js';
+import { fillDTO } from '../../helpers/common.js';
+import { OfferFavoriteRdo } from './index.js';
 
 
 @injectable()
@@ -21,15 +24,25 @@ export class OfferFavoritesController extends BaseController {
       path: '/',
       method: HttpMethod.Post,
       handler: this.add,
-      middlewares: [new ValidateDtoMiddleware(AddFavoriteOfferDto)]
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(AddFavoriteOfferDto)
+      ]
     });
 
     this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.delete });
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+      ]
+    });
   }
 
   public async add(req: Request, res: Response): Promise<void> {
-    await this.offerFaviritesService.add(req.body);
+    await this.offerFaviritesService.add({...req.body, userId: req.tokenPayload.id});
     this.ok(res, {message: 'Added to favorites'});
   }
 
@@ -38,8 +51,9 @@ export class OfferFavoritesController extends BaseController {
     this.noContent(res, {message: 'Deleted to favorites'});
   }
 
-  public async index(_req: Request, res: Response): Promise<void> {
-    const favorites = await this.offerFaviritesService.find();
-    this.ok(res, favorites);
+  public async index(req: Request, res: Response): Promise<void> {
+    const favorites = await this.offerFaviritesService.find(req.tokenPayload.id);
+
+    this.ok(res, fillDTO(OfferFavoriteRdo, favorites));
   }
 }
