@@ -15,6 +15,8 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { AuthService } from '../auth/auth-service.interface.js';
 import { LoggedUserRdo } from './rdo/logged-user.rdo.js';
+import { UploadUserAvatarRdo } from './rdo/upload-user-avatar.rdo.js';
+import { PrivateRouteMiddleware } from '../../libs/rest/middleware/private-route.middleware.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -46,6 +48,7 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('userId'),
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
@@ -89,10 +92,20 @@ export class UserController extends BaseController {
     }));
   }
 
-  public async uploadAvatar(req: Request, res: Response) {
-    this.created(res, {
-      filepath: req.file?.path
-    });
+  public async uploadAvatar({ params, file, tokenPayload }: Request, res: Response) {
+    const { userId } = params;
+
+    if (tokenPayload.id !== userId) {
+      throw new HttpError(
+        StatusCodes.FORBIDDEN,
+        'You cannot change another user\'s avatar',
+        'UserController'
+      );
+    }
+
+    const uploadFile = { avatar: file?.filename };
+    await this.userService.updateById(userId, uploadFile);
+    this.created(res, fillDTO(UploadUserAvatarRdo, { filepath: uploadFile.avatar }));
   }
 
   public async checkAuthenticate({ tokenPayload: { email }}: Request, res: Response) {
