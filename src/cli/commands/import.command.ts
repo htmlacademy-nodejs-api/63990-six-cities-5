@@ -12,6 +12,13 @@ import { DefaultUserService, UserModel } from '../../shared/modules/user/index.j
 import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.constant.js';
 import { Offer, UserType } from '../../shared/types/index.js';
 
+const defaultUserSettings = {
+  email: 'default@six-cities.com',
+  name: 'user',
+  type: UserType.default,
+  password: DEFAULT_USER_PASSWORD
+};
+
 export class ImportCommand implements Command {
   private userService: UserService;
   private offerService: OfferService;
@@ -46,14 +53,7 @@ export class ImportCommand implements Command {
   }
 
   private async saveOffer(offer: Offer) {
-    const user = await this.userService.findOrCreate({
-      email: 'default@six-cities.com',
-      avatar: 'no-photo.png',
-      name: 'user',
-      type: UserType.default,
-
-      password: DEFAULT_USER_PASSWORD
-    }, this.salt);
+    const user = await this.userService.findOrCreate(defaultUserSettings, this.salt);
 
     await this.offerService.create({
       ...offer,
