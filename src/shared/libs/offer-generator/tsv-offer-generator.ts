@@ -3,20 +3,23 @@ import { OfferGenerator } from './offer-generator.interface.js';
 import { generateRandomValue, getRandomItem, getRandomItems } from '../../helpers/index.js';
 import { MockServerData } from '../../types/mock-server-data.type.js';
 
-const MIN_RATING = 1;
-const MAX_RATING = 5;
+const Rules = {
+  minRating: 1,
+  maxRating: 5,
 
-const MIN_ROOMS = 1;
-const MAX_ROOMS = 8;
+  minRooms: 1,
+  maxRooms: 8,
 
-const MIN_GUESTS = 1;
-const MAX_GUESTS = 10;
+  minGuests: 1,
+  maxGuests: 10,
 
-const FIRST_WEEK_DAY = 1;
-const LAST_WEEK_DAY = 7;
+  firstWeekDay: 1,
+  lastWeekDay: 7,
 
-const MIN_COST = 100;
-const MAX_COST = 100000;
+  minCost: 100,
+  maxCost: 100000,
+} as const;
+
 
 export class TSVOfferGenerator implements OfferGenerator {
   constructor(private readonly mockData: MockServerData) {}
@@ -29,18 +32,18 @@ export class TSVOfferGenerator implements OfferGenerator {
     const photos = getRandomItems(this.mockData.photos).join(';');
     const isPremium = Boolean(generateRandomValue(0, 1)).toString();
     const isFavorite = Boolean(generateRandomValue(0, 1)).toString();
-    const rating = generateRandomValue(MIN_RATING, MAX_RATING).toString();
+    const rating = generateRandomValue(Rules.minRating, Rules.maxCost).toString();
     const houseType = getRandomItem(this.mockData.houseTypes);
-    const roomsCount = generateRandomValue(MIN_ROOMS, MAX_ROOMS).toString();
-    const guestsCount = generateRandomValue(MIN_GUESTS, MAX_GUESTS).toString();
-    const cost = generateRandomValue(MIN_COST, MAX_COST).toString();
+    const roomsCount = generateRandomValue(Rules.minRooms, Rules.maxRooms).toString();
+    const guestsCount = generateRandomValue(Rules.minGuests, Rules.maxGuests).toString();
+    const cost = generateRandomValue(Rules.minCost, Rules.maxCost).toString();
     const facilities = getRandomItems(this.mockData.facilities).join(';');
     const author = getRandomItem(this.mockData.users);
     const commentsCount = generateRandomValue(1,5).toString();
     const coords = getRandomItem<number[]>(this.mockData.coords).join(';');
 
     const createdDate = dayjs()
-      .subtract(generateRandomValue(FIRST_WEEK_DAY, LAST_WEEK_DAY), 'day')
+      .subtract(generateRandomValue(Rules.firstWeekDay, Rules.lastWeekDay), 'day')
       .toISOString();
 
     return [
